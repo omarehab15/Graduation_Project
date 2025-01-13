@@ -1,0 +1,121 @@
+%ENG:Ayman Hamdy Salem
+%ENG:Kareem Abdelkader Mohamed
+
+%--------------------------- Car Considration ---------------------------
+L_Car   = 30.0;                 % Car Lengh
+W_Car   = 12.0;                 % Car width
+L_WB    = 18.0;                 % Wheel base
+Lf      = 5.0;                  % Front overhang
+Lb      = 7.0;                  % Rear overhang
+Phi_max = 40.0*pi/180.0;        % Steering angle
+R_min = L_WB / tan(Phi_max);    % Minimum radius turn
+Kb      = W_Car / L_WB;         % Towing vehicle's wheelbase and crosbases
+u       = L_WB + Lf;            % Length from r to front of the car
+rf      = sqrt(u^2 + (W_Car/2)^2);
+rb      = sqrt(Lb^2 + (W_Car/2)^2);
+%------------------------------------------------------------------------
+
+%-------------------------- Parking Considration ------------------------
+d_SC = sqrt((R_min+W_Car/2)^2 + Lb^2) - R_min - W_Car/2; % side clearance
+d_FC = sqrt((L_WB+Lf)^2 + (R_min+W_Car/2)^2);            % front clearance
+HS = W_Car + d_SC;                                       % parking width
+LS = sqrt(d_FC^2-(R_min+W_Car/2+d_SC-HS)^2)+Lb ;         % parking lengh
+% X parking coordinate
+Xp = [-(2+Lb) -(2+Lb) (L_WB+Lf+9) (L_WB+Lf+9) -(2+Lb)];
+% Y parking coordinate
+Yp = [-(d_SC+W_Car/2) (d_SC+W_Car/2) (d_SC+W_Car/2) -(d_SC+W_Car/2) -(d_SC+W_Car/2)];
+%------------------------------------------------------------------------
+
+%------------------- car front and rear side points from r --------------
+X_ar = -Lb;                    % car rear side point (a)
+X_br = L_WB + Lf;              % car front side point (b)
+%------------------------------------------------------------------------
+
+%----------------- Starting point considration --------------------------
+S = LS - 0.5 ;                                                                     % Horizontal coordinate
+d_OC = (R_min-W_Car/2) - sqrt((R_min-W_Car/2)^2 - (S-LS+Lb)^2 );            % Obstacle clearance
+H = W_Car + 3.00 ; 
+%---------------------------------------------------
+
+%------------------ Path considration -----------------------------------
+k = (S*(H-2*R_min) + sqrt(4*(S^2+H^2)*R_min^2 - 16*H*R_min^3)) / (S^2 - 4*R_min^2);
+m = R_min*(1.0 - sqrt(1.0 + k^2));
+xf1 = S - (k*R_min)/sqrt(1+k^2);
+xf2 = k*R_min/sqrt(1+k^2);
+Rc = 0.0;
+Xv = S:-0.01:Rc;
+n = size(Xv,2);
+%------------------------------------------------------------------------
+
+%----------------------- Car body coordinate ----------------------------
+X_ib = [S-Lb S-Lb S+L_WB+Lf S+L_WB+Lf S-Lb];
+Y_ib = [H-W_Car/2 H+W_Car/2 H+W_Car/2 H-W_Car/2 H-W_Car/2];
+XFC = [-Lb -Lb L_WB+Lf L_WB+Lf -Lb];
+YFC = [-W_Car/2 W_Car/2 W_Car/2 -W_Car/2 -W_Car/2];
+
+Yrv = [];
+for i = 1:n
+    if Xv(i)<= S && Xv(i)>= xf1
+        Y = (H-R_min) + sqrt(R_min^2 - (Xv(i)-S)^2);
+    elseif Xv(i)< xf1 && Xv(i)>= xf2
+        Y = k * Xv(i) + m;
+    else 
+        Y = R_min - sqrt(R_min^2 - Xv(i)^2) ;
+    end
+    Yrv = [Yrv;Y];
+end
+
+Xu  = Xv + Lb;
+Xav = Xu + X_ar;
+Yu  = Yrv + W_Car/2;
+Yav = Yu - (W_Car/2);
+Xd  = Xv + Lb;
+Yd  = Yrv - W_Car/2;
+%------------------------------------------------------------------------
+%------------------------------------------------------------------------
+n       = size(Xv,2);
+c = 80;
+XFCV = [];
+YFCV = [];
+for j = 2:n
+    if rem(j,c) == 0
+    dy = (Yrv(j-1)-Yrv(j));
+    dx = (Xv(j-1)-Xv(j));
+    Q1 = atan2(dy,dx);
+    Qf = atan2(W_Car/2,u);
+    Qb = atan2(Lb,W_Car/2);
+    dxf = rf*cos(Q1);
+    dyf = rf*sin(Q1);
+    dxb = rb*cos(Q1);
+    dyb = rb*sin(Q1); 
+    XFC = [(Xv(j)-rb*sin(Qb-Q1)) (Xv(j)-rb*sin(Qb+Q1)) (Xv(j)+u*cos(Qf+Q1)) (Xv(j)+u*cos(Qf-Q1)) (Xv(j)-rb*sin(Qb-Q1))];
+    YFC = [(Yrv(j)-rb*cos(Qb-Q1)) (Yrv(j)+rb*cos(Qb+Q1)) (Yrv(j)+u*sin(Qf+Q1)) (Yrv(j)-u*sin(Qf-Q1)) (Yrv(j)-rb*cos(Qb-Q1))];
+    XFCV =[XFCV XFC'];
+    YFCV = [YFCV YFC'];
+    end
+end
+Xfc = [-Lb -Lb L_WB+Lf L_WB+Lf -Lb];
+Yfc = [-W_Car/2 W_Car/2 W_Car/2 -W_Car/2 -W_Car/2];
+dx = (Xv(end-1)-Xv(end));
+dy = (Yrv(end-1)-Yrv(end));
+Q1 = atan2(dy,dx);
+for i = 1:5
+    XFC(i) = XFC(i)*cos(Q1) - YFC(i)*sin(Q1);
+    YFC(i) = XFC(i)*sin(Q1) + YFC(i)*cos(Q1);
+end
+XC2 = [-Lb+41 -Lb+41 L_WB+Lf+41 L_WB+Lf+41 -Lb+41];
+YC2 = [-W_Car/2 W_Car/2 W_Car/2 -W_Car/2 -W_Car/2]; 
+
+%------------------------------------------------------------------------
+
+%------------------------------plotting----------------------------------
+figure
+plot(X_ib,Y_ib,'b--');
+hold on 
+plot(Xav,Yav,'k');
+hold on
+plot(Xp,Yp,'-k');
+hold on
+plot(XFC,YFC,'b--');
+hold on
+plot(XFCV,YFCV,'b--');
