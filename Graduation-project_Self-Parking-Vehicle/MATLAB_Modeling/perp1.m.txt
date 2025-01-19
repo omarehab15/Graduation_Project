@@ -1,0 +1,60 @@
+%ENG:Ayman Hamdy Salem
+%ENG:Kareem Abdelkader Mohamed
+
+%--------------------------- Car Considration ---------------------------
+L_Car   = 41.5;                 % Car Lengh
+W_Car   = 18.0;                 % Car width
+L_WB    = 27;                   % Wheel base
+Lf      = 6.25;                 % Front overhang
+Lb      = 8.25;                 % Rear overhang
+Phi_max = 40.0*pi/180.0;        % Steering angle
+R_min = L_WB / tan(Phi_max);    % Minimum radius turn
+Kb      = W_Car / L_WB;         % Towing vehicle's wheelbase and crosbases
+u       = L_WB + Lf;            % Length from r to front of the car
+rf      = sqrt(u^2 + (W_Car/2)^2);
+rb      = sqrt(Lb^2 + (W_Car/2)^2);
+%------------------------------------------------------------------------
+%------------------------------------------------------------------------
+d_SC = sqrt((R_min+W_Car/2)^2 + Lb^2) - R_min - W_Car/2; % side clearance
+d_FC = sqrt((L_WB+Lf)^2 + (R_min+W_Car/2)^2);            % front clearance
+HS = W_Car + d_SC;                                       % parking width
+LS = sqrt(d_FC^2-(R_min+W_Car/2+d_SC-HS)^2)+Lb ;         % parking lengh
+Xp = [-(d_SC+W_Car/2) (d_SC+W_Car/2) (d_SC+W_Car/2) -(d_SC+W_Car/2) -(d_SC+W_Car/2)];
+Yp = [-(2+Lb) -(2+Lb) (L_WB+Lf+12) (L_WB+Lf+12) -(2+Lb)];
+%-------------------------------------------------------------------------
+%-------------------------------------------------------------------------
+X_ar = -Lb;                    % car rear side point (a)
+X_br = L_WB + Lf;              % car front side point (b)
+S = 51.5;        
+H = 34.5; 
+%-------------------------------------------------------------------------
+%-------------------------------------------------------------------------
+X_ib = [S-Lb-30.3764 S-Lb-30.3764 S+L_WB+Lf-30.3764 S+L_WB+Lf-30.3764 S-Lb-30.3764];
+Y_ib = [22.1+H-W_Car/2 22.1+H+W_Car/2 22.1+H+W_Car/2 22.1+H-W_Car/2 22.1+H-W_Car/2];
+XFC = [-Lb -Lb L_WB+Lf L_WB+Lf -Lb];
+YFC = [-W_Car/2 W_Car/2 W_Car/2 -W_Car/2 -W_Car/2];
+
+Yrv = [];
+for i = 1:n
+    if Xv(i)<= S && Xv(i)>= xf1
+        Y = (H-R_min) + sqrt(R_min^2 - (Xv(i)-S)^2);
+    else Xv(i)< xf1 && Xv(i)>= xf2
+        Y = k * Xv(i) + m;
+    end
+    Yrv = [Yrv;Y];
+end
+Xu  = Xv + Lb;
+Xav = Xu + X_ar;
+Yu  = Yrv + W_Car/2;
+Yav = Yu - (W_Car/2);
+Xd  = Xv + Lb;
+Yd  = Yrv - W_Car/2;
+n       = size(Xv,2);
+%-------------------------------------------------------------------------
+%-------------------------------------------------------------------------
+figure
+plot(X_ib,Y_ib,'b--');
+hold on 
+%plot(Xav,Yav,'k');
+hold on
+plot(Xp,Yp,'-k');
