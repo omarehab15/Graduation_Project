@@ -121,5 +121,3 @@ Each parking scenario includes:
 **Supervisor:** Dr. Ahmed Abdelaziz Mohamed
 
 ---
-
-لو حابب README يكون بالعربي أو تحب أعمله نسختين (إنجليزي + عربي) قولي، أو لو عايزني أزود فيه لينك لصور أو فيديوهات للمشروع.
