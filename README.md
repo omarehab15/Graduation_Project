@@ -101,8 +101,8 @@ Each parking scenario includes:
 
 ## 📸 Gallery
 
-> **\[Add images of prototype here]**
-> Optionally embed video demo from YouTube if available.
+<img src="1725958842351.jpg" alt="the memory of a great team" width="450"/>
+<img src="IMG_20240906_001527.jpg" alt="The prototype" width="450"/>
 
 ---
 
@@ -121,5 +121,3 @@ Each parking scenario includes:
 **Supervisor:** Dr. Ahmed Abdelaziz Mohamed
 
 ---
-
-لو حابب README يكون بالعربي أو تحب أعمله نسختين (إنجليزي + عربي) قولي، أو لو عايزني أزود فيه لينك لصور أو فيديوهات للمشروع.
